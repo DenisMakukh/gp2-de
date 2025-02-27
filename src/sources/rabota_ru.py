@@ -27,14 +27,21 @@ class RabotaRuSource(Source):
         # await self._get_auth_permission()
 
         token = await self._get_auth_token()
-        for id in range(46950440, 46960440):
+        count_errors = 0
+
+        for idx in range(46950440, 46960440):
             try:
-                log.info(f"Parsing vacancy for id: {id}")
-                response = await self._get_vacancy(token, id)
+                log.info(f"Parsing vacancy for id: {idx}")
+                response = await self._get_vacancy(token, idx)
                 vacancy = response['response']
                 vacancies.append(vacancy)
+                count_errors = 0
             except Exception as e:
-                log.error(f"Error parsing vacancy for id: {id}")
+                count_errors += 1
+                if count_errors > 5:
+                    log.error("More than 5 error seq detected, breaking", e)
+                    break
+                log.error(f"Error parsing vacancy for id: {idx}")
 
         df = parse_json_list_to_dataframe(vacancies)
 
