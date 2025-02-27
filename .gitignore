@@ -147,7 +147,7 @@ dmypy.json
 
 dwh/
 
-*.csv
+#*.csv
 
 *.pt
 
