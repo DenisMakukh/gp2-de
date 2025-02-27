@@ -12,6 +12,7 @@ import pandas as pd
 
 from src.config import APP_ID, CODE_TOKEN, APP_SECRET
 from src.sources.source import Source
+from src.utils.rabota_ru_mapper import parse_json_list_to_dataframe
 from src.utils.signature import get_signature
 
 log = logging.getLogger(__name__)
@@ -20,16 +21,28 @@ log = logging.getLogger(__name__)
 class RabotaRuSource(Source):
     async def search(self) -> pd.DataFrame:
         log.info(f"Parsing rabota.ru source")
+        vacancies = []
 
         # Uncomment for unknown device
         # await self._get_auth_permission()
 
         token = await self._get_auth_token()
-        response = await self._get_vacancies(token, 46950440, 46950460)
+        for id in range(46950440, 46960440):
+            try:
+                log.info(f"Parsing vacancy for id: {id}")
+                response = await self._get_vacancy(token, id)
+                vacancy = response['response']
+                vacancies.append(vacancy)
+            except Exception as e:
+                log.error(f"Error parsing vacancy for id: {id}")
 
-        # TODO: parse into dataframe
+        df = parse_json_list_to_dataframe(vacancies)
 
-        print(response)
+        log.info("Saving vacancies to rabota_ru_vacancies.csv")
+        path = df.to_csv(f"rabota_ru_vacancies.csv", index=False)
+        log.info(f"Saving vacancies to rabota_ru_vacancies.csv done successfully {path}")
+
+        return df
 
     async def _get_auth_token(self) -> str:
         log.info("Getting rabota.ru auth token")
@@ -90,6 +103,24 @@ class RabotaRuSource(Source):
         json = {
             "request": {
                 "vacancy_ids": ids_to_find
+            }
+        }
+
+        response = await self.make_request("POST", url, headers=headers, body=json)
+        return response
+
+    async def _get_vacancy(self, token, id: int):
+        log.info("Getting rabota.ru vacancy")
+        url = "https://api.rabota.ru/v6/vacancy.json"
+
+        headers = {
+            "Content-Type": "application/json",
+            "X-Token": token
+        }
+
+        json = {
+            "request": {
+                "vacancy_id": id
             }
         }
 
