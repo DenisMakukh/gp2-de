@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+from src.sources.hh_ru import HHRuSource
 from src.sources.rabota_ru import RabotaRuSource
 from src.utils.setup_logging import setup_logging
 
@@ -11,3 +12,5 @@ if __name__ == '__main__':
     log.info("Logging setup successfully")
     rabota_ru = RabotaRuSource()
     asyncio.run(rabota_ru.search())
+    hh_ru = HHRuSource()
+    asyncio.run(hh_ru.search())
