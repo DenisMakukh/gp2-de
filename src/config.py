@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-CODE_TOKEN = os.getenv("CODE_TOKEN")
-APP_ID = os.getenv("APP_ID")
-APP_SECRET = os.getenv("APP_SECRET")
+RABOTA_RU_CODE_TOKEN = os.getenv("RABOTA_RU_CODE_TOKEN")
+RABOTA_RU_APP_ID = os.getenv("RABOTA_RU_APP_ID")
+RABOTA_RU_APP_SECRET = os.getenv("RABOTA_RU_APP_SECRET")
+
+SUPERJOB_SECRET = os.getenv("SUPERJOB_SECRET")

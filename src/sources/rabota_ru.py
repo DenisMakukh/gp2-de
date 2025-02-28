@@ -3,7 +3,7 @@ import logging
 import time
 import pandas as pd
 
-from src.config import APP_ID, CODE_TOKEN, APP_SECRET
+from src.config import RABOTA_RU_APP_ID, RABOTA_RU_CODE_TOKEN, RABOTA_RU_APP_SECRET
 from src.sources.source import Source
 from src.utils.rabota_ru_mapper import parse_json_list_to_dataframe
 from src.utils.signature import get_signature
@@ -33,7 +33,6 @@ class RabotaRuSource(Source):
             last_processed_id = 46955330
 
         token = await self._get_auth_token()
-        count_errors = 0
 
         for idx in range(last_processed_id, 46960440):
             try:
@@ -41,14 +40,12 @@ class RabotaRuSource(Source):
                 response = await self._get_vacancy(token, idx)
                 vacancy = response['response']
                 vacancies.append(vacancy)
-                count_errors = 0
 
                 if idx % 10 == 0:
                     self._save_vacancies(vacancies)
                     self._save_checkpoint(idx)
 
             except Exception as e:
-                count_errors += 1
                 log.error(f"Error parsing vacancy for id: {idx}")
 
         self._save_vacancies(vacancies)
@@ -76,12 +73,12 @@ class RabotaRuSource(Source):
         current_time = str(int(time.time()))
 
         params = {
-            "app_id": APP_ID,
+            "app_id": RABOTA_RU_APP_ID,
             "time": current_time,
-            "code": CODE_TOKEN,
+            "code": RABOTA_RU_CODE_TOKEN,
         }
 
-        signature = get_signature(params, APP_SECRET)
+        signature = get_signature(params, RABOTA_RU_APP_SECRET)
 
         data = {**params, "signature": signature}
 
@@ -106,7 +103,7 @@ class RabotaRuSource(Source):
     async def _get_auth_permission(self):
         log.info("Getting rabota.ru auth permission")
         params = {
-            "app_id": APP_ID,
+            "app_id": RABOTA_RU_APP_ID,
             "scope": "profile,vacancies",
             "display": "page",
             "redirect_uri": "http://www.example.com/oauth"

@@ -45,7 +45,7 @@ class HHRuSource(Source):
                     all_vacancies.extend(vacancies)
 
             df = pd.DataFrame(all_vacancies)
-            df.to_csv("vacancies.csv", index=False, encoding="utf-8-sig")
+            df.to_csv("hh_ru_vacancies.csv", index=False, encoding="utf-8-sig")
             log.info("Vacancies parsed in {} seconds".format(time.time() - start_time))
             print(df.head())
             return df
